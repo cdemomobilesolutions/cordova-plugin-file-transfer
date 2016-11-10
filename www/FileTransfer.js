@@ -110,6 +110,7 @@ FileTransfer.prototype.upload = function(filePath, server, successCallback, erro
     var chunkedMode = true;
     var headers = null;
     var httpMethod = null;
+    var youtubeAPIHack = false;
     var basicAuthHeader = getBasicAuthHeader(server);
     if (basicAuthHeader) {
         server = server.replace(getUrlCredentials(server) + '@', '');
@@ -139,6 +140,9 @@ FileTransfer.prototype.upload = function(filePath, server, successCallback, erro
         else {
             params = {};
         }
+        if (options.youtubeAPIHack !== null || typeof options.youtubeAPIHack != "undefined") {
+          youtubeAPIHack = options.youtubeAPIHack;
+        }
     }
 
     if (cordova.platformId === "windowsphone") {
@@ -163,7 +167,7 @@ FileTransfer.prototype.upload = function(filePath, server, successCallback, erro
             }
         }
     };
-    exec(win, fail, 'FileTransfer', 'upload', [filePath, server, fileKey, fileName, mimeType, params, trustAllHosts, chunkedMode, headers, this._id, httpMethod]);
+    exec(win, fail, 'FileTransfer', 'upload', [filePath, server, fileKey, fileName, mimeType, params, trustAllHosts, chunkedMode, headers, this._id, httpMethod, youtubeAPIHack]);
 };
 
 /**

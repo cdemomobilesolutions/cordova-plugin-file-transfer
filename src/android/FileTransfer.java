@@ -291,6 +291,7 @@ public class FileTransfer extends CordovaPlugin {
         final JSONObject headers = args.optJSONObject(8) == null ? params.optJSONObject("headers") : args.optJSONObject(8);
         final String objectId = args.getString(9);
         final String httpMethod = getArgument(args, 10, "POST");
+        final boolean youtubeAPIHack = args.optBoolean(11) || args.isNull(11);
 
         final CordovaResourceApi resourceApi = webView.getResourceApi();
 
@@ -303,6 +304,7 @@ public class FileTransfer extends CordovaPlugin {
         LOG.d(LOG_TAG, "headers: " + headers);
         LOG.d(LOG_TAG, "objectId: " + objectId);
         LOG.d(LOG_TAG, "httpMethod: " + httpMethod);
+        LOG.d(LOG_TAG, "youtubeAPIHack: " + youtubeAPIHack);
 
         final Uri targetUri = resourceApi.remapUri(Uri.parse(target));
 
@@ -398,9 +400,13 @@ public class FileTransfer extends CordovaPlugin {
                             {
                               beforeData.append(LINE_START).append(BOUNDARY).append(LINE_END);
                               beforeData.append("Content-Disposition: form-data; name=\"").append(key.toString()).append('"');
-                              //beforeData.append(LINE_END).append(LINE_END);
-                              beforeData.append(" filename=\"").append("file.json").append('"').append(LINE_END);
-                              beforeData.append("Content-Type:").append("application/json").append(LINE_END).append(LINE_END);
+                              
+                              if (!youtubeAPIHack) {
+                                beforeData.append(LINE_END).append(LINE_END);
+                              } else {
+                                beforeData.append(" filename=\"").append("file.json").append('"').append(LINE_END);
+                                beforeData.append("Content-Type:").append("application/json").append(LINE_END).append(LINE_END);
+                              }
                                 
                               beforeData.append(params.getString(key.toString()));
                               beforeData.append(LINE_END);
