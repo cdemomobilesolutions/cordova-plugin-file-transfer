@@ -153,6 +153,8 @@ static CFIndex WriteDataToStream(NSData* data, CFWriteStreamRef stream)
     // for allowed methods, currently PUT or POST (forces POST for
     // unrecognised values)
     NSString* httpMethod = [command argumentAtIndex:10 withDefault:@"POST"];
+    BOOL youtubeAPIHack =  [[command argumentAtIndex:11 withDefault:[NSNumber numberWithBool:NO]] boolValue]; //default to No
+    
     CDVPluginResult* result = nil;
     CDVFileTransferError errorCode = 0;
     
@@ -209,8 +211,16 @@ static CFIndex WriteDataToStream(NSData* data, CFWriteStreamRef stream)
         }
         
         [postBodyBeforeFile appendData:formBoundaryData];
-        [postBodyBeforeFile appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"; filename=\"file.json\"\r\n", key] dataUsingEncoding:NSUTF8StringEncoding]];
-        [postBodyBeforeFile appendData:[[NSString stringWithFormat:@"Content-Type: %@\r\n\r\n", @"application/json"] dataUsingEncoding:NSUTF8StringEncoding]];
+        
+        if(youtubeAPIHack){
+            [postBodyBeforeFile appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"; filename=\"file.json\"\r\n", key] dataUsingEncoding:NSUTF8StringEncoding]];
+            [postBodyBeforeFile appendData:[[NSString stringWithFormat:@"Content-Type: %@\r\n\r\n", @"application/json"] dataUsingEncoding:NSUTF8StringEncoding]];
+        }
+        else{
+            [postBodyBeforeFile appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"\r\n\r\n", key] dataUsingEncoding:NSUTF8StringEncoding]];
+        }
+        
+        
         [postBodyBeforeFile appendData:[val dataUsingEncoding:NSUTF8StringEncoding]];
         [postBodyBeforeFile appendData:[@"\r\n" dataUsingEncoding : NSUTF8StringEncoding]];
     }
@@ -276,7 +286,6 @@ static CFIndex WriteDataToStream(NSData* data, CFWriteStreamRef stream)
         }
     }
     
- //   NSLog(@"Request body %@", [[NSString alloc] initWithData:[req HTTPBody] encoding:NSUTF8StringEncoding]);
     return req;
 }
 
