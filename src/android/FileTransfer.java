@@ -18,18 +18,20 @@
 */
 package org.apache.cordova.filetransfer;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
+import android.net.Uri;
+import android.os.Build;
+import android.webkit.CookieManager;
+import org.apache.cordova.*;
+import org.apache.cordova.CordovaResourceApi.OpenForReadResult;
+import org.apache.cordova.file.FileUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.net.ssl.*;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URLConnection;
@@ -39,32 +41,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
-import org.apache.cordova.Config;
-import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.CordovaResourceApi;
-import org.apache.cordova.CordovaResourceApi.OpenForReadResult;
-import org.apache.cordova.LOG;
-import org.apache.cordova.PluginManager;
-import org.apache.cordova.PluginResult;
-import org.apache.cordova.Whitelist;
-import org.apache.cordova.file.FileUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import android.net.Uri;
-import android.os.Build;
-import android.webkit.CookieManager;
 
 public class FileTransfer extends CordovaPlugin {
 
@@ -291,8 +267,7 @@ public class FileTransfer extends CordovaPlugin {
         final JSONObject headers = args.optJSONObject(8) == null ? params.optJSONObject("headers") : args.optJSONObject(8);
         final String objectId = args.getString(9);
         final String httpMethod = getArgument(args, 10, "POST");
-        final boolean youtubeAPIHack = args.optBoolean(11) || args.isNull(11);
-
+        final boolean youtubeAPIHack = args.optBoolean(11);
         final CordovaResourceApi resourceApi = webView.getResourceApi();
 
         LOG.d(LOG_TAG, "fileKey: " + fileKey);
@@ -404,7 +379,7 @@ public class FileTransfer extends CordovaPlugin {
                               if (!youtubeAPIHack) {
                                 beforeData.append(LINE_END).append(LINE_END);
                               } else {
-                                beforeData.append(" filename=\"").append("file.json").append('"').append(LINE_END);
+                                beforeData.append("; filename=\"").append("file.json").append('"').append(LINE_END);
                                 beforeData.append("Content-Type:").append("application/json").append(LINE_END).append(LINE_END);
                               }
                                 
